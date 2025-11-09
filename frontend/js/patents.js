@@ -1,5 +1,3 @@
-// patents.js
-
 document.addEventListener('DOMContentLoaded', () => {
   const resultsContainer = document.getElementById('results');
   const metaText = document.getElementById('meta');
@@ -7,16 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const urlParams = new URLSearchParams(window.location.search);
   const drug = urlParams.get('drug') || 'paracetamol';
-
   metaText.textContent = `🔍 Searching patents for "${drug}"...`;
 
   async function fetchPatents() {
     try {
-      const response = await fetch(`http://localhost:5000/api/research/patents?q=${drug}`);
+      const response = await fetch(`/api/research/patents?q=${encodeURIComponent(drug)}`);
       if (!response.ok) throw new Error("Failed to fetch data from backend.");
       const data = await response.json();
 
-      // Auto-detect the correct result array
       let patents = [];
       if (Array.isArray(data)) patents = data;
       else if (Array.isArray(data.results)) patents = data.results;
@@ -39,11 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function displayPatents(patents) {
     resultsContainer.innerHTML = '';
-
     patents.forEach(p => {
       const card = document.createElement('div');
       card.className = 'patent-card';
-
       card.innerHTML = `
         <h2>${p.title || 'No Title Available'}</h2>
         <p><strong>Authors:</strong> ${p.authorString || 'Unknown'}</p>
@@ -55,14 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
         <p><strong>Abstract:</strong> ${p.abstractText || 'No abstract available.'}</p>
         <a href="https://europepmc.org/article/${p.source || 'MED'}/${p.id || ''}" target="_blank" class="link">🔗 View Full Patent</a>
       `;
-
       resultsContainer.appendChild(card);
     });
   }
 
-  backBtn.addEventListener('click', () => {
-    window.history.back();
-  });
-
+  backBtn.addEventListener('click', () => window.history.back());
   fetchPatents();
 });

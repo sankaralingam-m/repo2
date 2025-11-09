@@ -1,10 +1,6 @@
-// pubmed.js
-
 const resultsEl = document.getElementById('results');
 const metaEl = document.getElementById('meta');
 const backBtn = document.getElementById('backBtn');
-
-// Get last searched drug name
 const query = localStorage.getItem('lastQuery');
 
 async function fetchPubMedArticles() {
@@ -16,8 +12,7 @@ async function fetchPubMedArticles() {
   metaEl.textContent = `Fetching PubMed articles for "${query}"...`;
 
   try {
-    // Fetch from backend
-    const res = await fetch(`http://localhost:5000/api/research/pubmed/${encodeURIComponent(query)}`);
+    const res = await fetch(`/api/research/pubmed?query=${encodeURIComponent(query)}`);
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
     const data = await res.json();
@@ -30,9 +25,8 @@ async function fetchPubMedArticles() {
 
     metaEl.textContent = `Found ${articles.length} PubMed articles for "${data.drug || query}".`;
 
-    // Render articles
     resultsEl.innerHTML = articles
-      .map((a) => `
+      .map(a => `
         <div class="card paper-card">
           <h3>${a.title || 'Untitled Article'}</h3>
           <p><strong>Authors:</strong> ${a.authors || 'Unknown'}</p>
@@ -40,15 +34,11 @@ async function fetchPubMedArticles() {
           <p><strong>Publication Date:</strong> ${a.pubdate || 'N/A'}</p>
           <p><a href="${a.link}" target="_blank">🔗 View on PubMed</a></p>
         </div>
-      `)
-      .join('');
+      `).join('');
   } catch (err) {
     metaEl.textContent = `Error fetching PubMed data: ${err.message}`;
   }
 }
 
-// Back button → return to index
 backBtn.addEventListener('click', () => (window.location.href = '../index.html'));
-
-// Run on page load
 fetchPubMedArticles();

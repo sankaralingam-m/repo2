@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   meta.textContent = `Fetching clinical trials for "${query}"...`;
 
   try {
-    const response = await fetch(`http://localhost:5000/api/research/trials/${encodeURIComponent(query)}`);
+    const response = await fetch(`/api/research/trials?query=${encodeURIComponent(query)}`);
     if (!response.ok) throw new Error(`Backend returned ${response.status}`);
 
     const data = await response.json();
@@ -23,8 +23,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     trials.forEach((item) => {
       const p = item.protocolSection || {};
-
-      // Modules
       const id = p.identificationModule || {};
       const status = p.statusModule || {};
       const sponsor = p.sponsorCollaboratorsModule || {};
@@ -34,7 +32,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const eligibility = p.eligibilityModule || {};
       const locations = p.locationsModule || {};
 
-      // Extract key info
       const nctId = id.nctId || "N/A";
       const title = id.briefTitle || "Untitled Study";
       const fullTitle = id.officialTitle || "No official title available.";
@@ -61,7 +58,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const link = `https://clinicaltrials.gov/study/${nctId}`;
 
-      // Create card
       const card = document.createElement("div");
       card.className = "trial-card";
 
